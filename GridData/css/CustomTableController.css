@@ -1,0 +1,196 @@
+.prevent-select {
+  user-select: none;
+}
+
+.control-container {
+  border: none;
+}
+
+.overflow-wrapper .ant-table-body { 
+  overflow-y: hidden !important; 
+  overflow-x: auto;
+}
+
+.pcf-wrapper .ant-table-cell .ant-form-item {
+  margin-bottom: 0 !important;
+}
+
+.flex-wrap {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.control-pane {
+  flex: 1 !important;       
+  width: 80% !important;
+}
+
+.io-pane {
+  flex: 1 !important;    
+  width: 20% !important;
+}
+
+.pcf-wrapper .ant-input-number {
+  width: 100%;
+  border-radius: 4px;
+
+}
+
+.pcf-wrapper .ant-picker {
+  width: 100%;
+  border-radius: 4px;
+}
+
+.pcf-wrapper  .ant-form-item .ant-form-item-explain-error {
+  font-size: 10px;
+}
+
+.pcf-wrapper .ant-table-tbody {
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.pcf-wrapper .float-right {
+  text-align: right;
+}
+
+.pcf-wrapper table  tr {
+  vertical-align: top;
+}
+
+.pcf-wrapper .btn-red-outline,.pcf-wrapper .btn-red-outline:hover,.pcf-wrapper .btn-red-outline:active {
+  color: #0f6cbd;
+  border-color: #0f6cbd;
+  background-color: transparent !important;
+  min-width: 90px;
+  height: 30px;
+  border-radius: 4px;
+  font-size: 14px;
+  outline: none !important;
+  box-shadow: none !important;
+  padding: 2px 8px;
+}
+
+.pcf-wrapper .btn-blue, .pcf-wrapper .btn-blue:hover, .btn-blue:active, .btn-blue:focus {
+  min-width: 90px;
+  height: 30px;
+  background-color: #0f6cbd !important;
+  border-color: #0f6cbd !important;;
+  color: #ffffff !important;
+  border-radius: 4px;
+  font-size: 14px;
+  outline: none !important;
+  box-shadow: none !important;
+  padding: 2px 8px;
+}
+
+.pcf-wrapper .ant-btn-primary:disabled {
+  opacity: 0.7;
+}
+
+.pcf-wrapper .ant-select-selector {
+  background: #FFFFFF;
+  border: 0.5px solid #C1BDBD;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.pcf-wrapper .mb-20 {
+  margin-bottom: 20px;
+}
+
+.pcf-wrapper .mt-20 {
+  margin-top: 20px;
+}
+
+.pcf-wrapper .mr-10 {
+  margin-right: 10px;
+}
+
+.pcf-wrapper table {
+  border: none !important;
+  border-color: transparent !important;
+  border-radius: 0;
+}
+
+.pcf-wrapper  .ant-table-header table {
+  border-top: 1px solid rgb(224, 224, 224) !important;
+}
+
+.pcf-wrapper  .ant-table-body {
+  margin-bottom: 20px;
+}
+
+.pcf-wrapper .ant-checkbox+span{
+  color: rgb(36, 36, 36) !important;
+  font-size: 12px !important;
+  font-weight: 600;
+}
+
+.pcf-wrapper .ant-checkbox .ant-checkbox-inner {
+  height: 20px;
+  width: 20px;
+  border-radius: 2px;
+}
+
+.pcf-wrapper td {
+  color: rgb(36, 36, 36) !important;
+  font-size: 14px !important;
+  font-weight: 400;
+  padding: 11px 12px !important;
+  border-right: none !important;
+  font-family: "Segoe UI", "Segoe UI Web (West European)", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif;
+}
+
+.pcf-wrapper th {
+  border-bottom: 1px solid rgb(224, 224, 224) !important;
+  font-size: 12px !important;
+  font-weight: 600;
+  color: rgb(36, 36, 36) !important;
+  padding: 11px 12px !important;
+  border-right: none !important;
+  background-color: transparent !important;
+  font-family: "Segoe UI", "Segoe UI Web (West European)", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif;
+}
+
+.pcf-wrapper th:hover { 
+  background: #fafafa;
+}
+
+.pcf-wrapper th, .pcf-wrapper td a{
+  color: rgb(36, 36, 36) !important;
+}
+
+.pcf-wrapper td a:hover{
+  color: rgb(17, 94, 163)  !important;
+  text-decoration: underline;
+}
+
+.pcf-wrapper .tbody tr:hover, .pcf-wrapper .tbody  .ant-table-selection-column{
+  background: rgb(237, 235, 233) !important;  
+}
+
+.pcf-wrapper .ant-table-container {
+  border-inline-start: none !important;
+  border-top: none !important;
+}
+
+.pcf-wrapper .ant-table-wrapper .ant-table-thead >tr>td {
+  background: #ffffff !important;
+  border-color: 1px solid rgb(224, 224, 224) !important;
+  vertical-align: middle;
+}
+
+
+.pcf-wrapper .ant-typography {
+  color: rgb(17, 94, 163) !important;
+}
+
+.pcf-wrapper .ant-input-number .ant-input-number-input, .ant-input {
+  border-radius: 4px !important;
+}
+
+.pcf-wrapper .ant-table-wrapper .ant-table-tbody >tr >td {
+  border-color:  rgb(224, 224, 224) !important;
+}

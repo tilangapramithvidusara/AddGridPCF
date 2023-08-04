@@ -1,0 +1,113 @@
+[
+  {
+    "id": "Col!1",
+    "order": "name",
+    "datatype": "String",
+    "guid": "acAqwy54352Abvd",
+    "validationData": {
+      "allowDuplicates": true,
+      "isMandatory": false,
+      "maxLength": 10,
+      "maxValue": 0,
+      "minLength": 4,
+      "minValue": 0,
+      "numberOfDecimalPlaces": 0
+    },
+    "iseditable":true,
+    "width":360
+  },
+  {
+    "id": "Col2",
+    "order": "age",
+    "guid": "acwewy54352Abvd",
+    "datatype": "List",
+    "width":360 ,
+    "data": [
+      {
+        "value": "monday",
+        "label": "Monday"
+      },
+      {
+        "value": "tuesday",
+        "label": "Tuesday"
+      },
+      {
+        "value": "wednesday",
+        "label": "Wednesday"
+      },
+      {
+        "value": "thursday",
+        "label": "Thursday"
+      },
+      {
+        "value": "friday",
+        "label": "Friday"
+      }
+    ],
+    "validationData": {
+      "allowDuplicates": true,
+      "isMandatory": true,
+      "maxLength": 0,
+      "maxValue": 0,
+      "minLength": 0,
+      "minValue": 0,
+      "numberOfDecimalPlaces": 0 
+    }
+  },
+  {
+    "id": "Tier",
+    "order": "address",
+    "guid": "acyywy54352Abvd",
+    "datatype": "List",
+    "data": [
+      {
+        "value": "Y",
+        "label": "Yes"
+      },
+      {
+        "value": "N",
+        "label": "No"
+      }
+    ],
+    "validationData": {
+      "allowDuplicates": true,
+      "isMandatory": false,
+      "maxLength": 0,
+      "maxValue": 0,
+      "minLength": 0,
+      "minValue": 0,
+      "numberOfDecimalPlaces": 0
+    }
+  },
+  {
+    "id": "Col3",
+    "order": "name2",
+    "guid": "acAqwy5435opbvd",
+    "datatype": "Numeric",
+    "validationData": {
+      "allowDuplicates": false,
+      "isMandatory": false,
+      "maxLength": 0,
+      "maxValue": 5,
+      "minLength": 0,
+      "minValue": 1,
+      "numberOfDecimalPlaces": 0
+    },
+    "width":360
+  } ,
+  {
+    "id": "Coll4",
+    "order": "name3",
+    "guid": "acAqwy543cxAbvd",
+    "datatype": "Date",
+    "validationData": {
+      "allowDuplicates": false,
+      "isMandatory": false,
+      "maxLength": 0,
+      "maxValue": 0,
+      "minLength": 0,
+      "minValue": 0,
+      "numberOfDecimalPlaces": 0
+    }
+  }
+]
