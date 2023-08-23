@@ -5,6 +5,7 @@ import { generateColumns } from "../utils/GenerateColumns";
 import ColumnsDetails from "../ColumnsDetails.json";
 import { fetchRecordId, fetchRequest, retrieveColumnDetails, saveColumnData, saveRequest } from "../utils/xrmapi/api";
 import { GYDE_GRID_QUESTION, GYDE_SURVEY_TEMPLATE, SUCCESS_COLOUR_CODE } from "../constants/Constants";
+import { isValidDateFormat } from "../utils/DateValidator";
 
 interface Item {
   key: string;
@@ -24,7 +25,7 @@ const CustomTable: React.FC = () => {
   const [form] = Form.useForm();
   const [count, setCount] = useState(0);
   const [questionId, setQuestionId] = useState("");
-  const [selectedRowKeys, setSelectedRowKeys] = useState<any>([]);
+  const [selectedRows, setSelectedRows] = useState<any>([]);
   const [dynamicColumns, setDynamicColumns] = useState<any>([]);
   const [columns, setColumns] = useState<any>([]);
   const initialValues = {};
@@ -40,18 +41,18 @@ const CustomTable: React.FC = () => {
       {
         "key":0,
         "Col1": "asfasfaa",
-        "Col2": "monday",
-        "Tier": "N",
+        "Col2": "12abc",
+        "Tier": "abce",
         "Col3": 2,
         "Col4": "2023-05-14"
     },
     {
         "key":1,
         "Col1": "asfasfa",
-        "Col2": "tuesday",
-        "Tier": "Y",
+        "Col2": "13abc",
+        "Tier": "abcd",
         "Col3": 3,
-        "Col4": "2023-05-14"
+        "Col4": null
     }
   ],
   [
@@ -159,7 +160,7 @@ const CustomTable: React.FC = () => {
                     ...item,
                     validationData:{
                       allowDuplicates:completeData?.gyde_isdontallowduplicates,
-                      isMandatory:completeData?.gyde_isdontallowduplicates,
+                      isMandatory:completeData?.gyde_ismandatory,
                       maxLength:completeData?.gyde_maxlength,
                       maxValue:completeData?.gyde_maxvalue,
                       minLength:completeData?.gyde_minlength,
@@ -217,58 +218,40 @@ const CustomTable: React.FC = () => {
         }, 10000);
       });
   };
+  console.log("dataSource", dataSource);
 
   useEffect(() => {
     allDataFetch();
     // CALL WEBRESOURCES
     loadResourceString();
 
-    return(()=>{
-      localStorage.removeItem("inputData");
-      localStorage.removeItem("deletedKeys");
-    });
   }, []);
 
-  const isValidDateFormat = (value: string): boolean => {
-    const regex = /^\d{4}-\d{2}-\d{2}$/;
-    return regex.test(value);
-  };
-
-  useEffect(() =>{
-    const data:any = localStorage.getItem("inputData");
-    const keys:any = localStorage.getItem("deletedKeys");
-    const convertedKey = JSON.parse(keys);
-    const convertedData = data  && JSON?.parse(data)?.filter((item:any)=>!convertedKey?.includes(item?.key));
-      convertedData?.length>0 && setInputValues(convertedData);
-      convertedData?.length>0 && setDataSource(convertedData);
+  const columnMapping = (data:any) => {
     const extractedIds = dynamicColumns?.map((obj:any) => obj.id);
-      const modifiedData:any = [];
-      (convertedData ? convertedData : inputValues)?.forEach((obj:any, index:number) => {
-        const newObj: any = { key: index };
-        extractedIds.forEach((id:any, num:number) => {
-          const columnId = Object.keys(obj)?.filter((item:any)=>item !== "key")?.[num];
-          if(columnId == id){             
-            if( obj[columnId]?.toString()?.includes("-") && typeof obj[columnId] == "string" && isValidDateFormat(obj[columnId])){
-              // console.log("date if id equal...",id, obj[id] );
-              newObj[id] = dayjs(obj[id]);
-            }else{
-              // console.log("columns with equal id...", id,obj[id] );
-              newObj[id] = obj[id];
-            }
+    const modifiedData:any = [];
+    data?.forEach((obj:any, index:number) => {
+      const newObj: any = { key: index };
+      extractedIds.forEach((id:any, num:number) => {
+        const columnId = Object.keys(obj)?.filter((item:any)=>item !== "key")?.[num];
+        if(columnId == id){             
+          if(isValidDateFormat(obj[columnId])){
+            newObj[id] = dayjs(obj[id]);
           }else{
-            if( obj[columnId]?.toString()?.includes("-") && typeof obj[columnId] != "string" && isValidDateFormat(obj[columnId])){
-              // console.log("date if id NOT equal...",id, obj[id] );
-              newObj[id] = dayjs(obj[columnId]);
-            }else{
-              newObj[id] = obj[columnId];
-            }
+            newObj[id] = obj[id];
           }
-        });
-        modifiedData.push(newObj);
+        }else{
+          if( isValidDateFormat(obj[columnId])){
+            newObj[id] = dayjs(obj[columnId]) ;
+          }else{
+            newObj[id] = obj[columnId];
+          }
+        }
       });
-    form.setFieldsValue(modifiedData);
-    localStorage.removeItem("inputData");
-  },[deleteTrigger])
+      modifiedData?.push(newObj);
+    });
+    return modifiedData;
+  }
 
   useEffect(()=>{
     form.resetFields();   
@@ -289,19 +272,24 @@ const CustomTable: React.FC = () => {
   //   setDataSource(xx[0]);
   //   setLockData(xx[1])
   //   setInputValues(xx[0]);
-  //   setColumnsData(ColumnsDetails, xx[0], form, isDisable, xx[1]);
+  //   setColumnsData(ColumnsDetails, xx[0], form, isDisable, xx[1],inputValues);
   // }, []);
 
   const handleLockData = (columnName: string, value: boolean) => {
-    setLockData(() => {
-      const newData = [...lockData];  
-      const foundIndex = newData.findIndex((item) =>item.id === columnName);
-      if (foundIndex !== -1) {
-          // Update existing item if value is checked
-          newData[foundIndex] = { ...newData[foundIndex], "iseditable": !value };
-      }
-      return newData;
-    });
+    console.log("column name when edit:", columnName,lockData);
+      const newData = [...lockData] ; 
+      console.log("newData when edit:", newData); 
+      const dataRecord = newData && newData?.map((item:any)=>{
+        if(item.guid == columnName){
+          return{
+            ...item,
+            "iseditable":!value
+          }
+        }
+        return {...item,"iseditable": value}
+      })
+      setLockData(dataRecord);
+      console.log("column changed:", newData, dataRecord);
   }
 
   const setColumnsData = (
@@ -339,23 +327,37 @@ const CustomTable: React.FC = () => {
     return obj;
   };
 
-  const handleDelete = async(key: []) => {
-    localStorage.setItem("deletedKeys",JSON.stringify(key));
-    const newData = await dataSource.filter(
-      (item: any) => !key.some((rowKey) => rowKey === item.key)
+  const replaceUndefinedWithNull = (obj:any) => {
+    Object?.keys(obj)?.forEach((key) => {
+      if (obj[key] === undefined) {
+        obj[key] = null;
+      }
+    });
+  };
+
+  const handleDelete = async(rows: []) => {
+    console.log("inputValues",inputValues, rows);
+    const deletedRows = rows?.map((item:any)=>item?.key);
+    const newData = await inputValues?.filter(
+      (item: any) => !deletedRows?.includes(item?.key)
     );
+    newData?.forEach((item:any) => {
+      replaceUndefinedWithNull(item);
+    });
     setDataSource(newData);
     setInputValues(newData);
-    setSelectedRowKeys([]);
+    setSelectedRows([]);
     setTimeout(()=>{
       form.resetFields();
-      setDeleteTrigger(!deleteTrigger);
+      form.setFieldsValue(columnMapping(newData));
     },300);
+    // localStorage.setItem("deletedRows",JSON.stringify(newData));
+    console.log("newData", newData);
   };
  
   const rowSelection = {
     onChange: (selectedRowKeys: React.Key[], selectedRows: any[]) => {
-      setSelectedRowKeys(selectedRowKeys);
+      setSelectedRows(selectedRows);
     },
     getCheckboxProps: (record:any) => ({
       disabled:isDisable
@@ -368,20 +370,18 @@ const CustomTable: React.FC = () => {
     form.resetFields();
   };
 
-  const handleAdd = () => {
-    const column = columns?.map((item: any) => item?.columnTitle);
+  const handleAdd = async() => {
+    const column = await columns?.map((item: any) => item?.columnTitle);
     let modifiedObj = arrayToObj(column);
-    modifiedObj = {key:dataSource?.length +1, ...modifiedObj};
-    setDataSource([...dataSource, modifiedObj]);
-    setCount(count + 1);
-  };
-
-  const replaceUndefinedWithNull = (obj:any) => {
-    Object?.keys(obj)?.forEach((key) => {
-      if (obj[key] === undefined) {
-        obj[key] = null;
-      }
+    dataSource?.push(modifiedObj);
+    console.log("newData add", dataSource);
+    const allData = [...dataSource]?.map((item:any,num:number)=>{
+       const replaceKey = {...item ,key:num };
+       const { key, ...restOfAttributes } = replaceKey;
+        return { key, ...restOfAttributes };
     });
+    console.log("allData add", allData);
+    setDataSource([...allData]);
   };
 
   const handleSave = async (data: any) => {
@@ -454,7 +454,7 @@ const CustomTable: React.FC = () => {
       >
         <div className="float-right mb-20">
         <Button
-            onClick={() => handleDelete(selectedRowKeys)}
+            onClick={() => handleDelete(selectedRows)}
             type="primary"
             className="btn-red-outline mr-10"
             disabled={isDisable}

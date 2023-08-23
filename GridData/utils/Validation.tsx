@@ -1,14 +1,17 @@
 import moment from "moment";
 import {stringReplace} from "../utils/StringReplace"
+import { isValidDateFormat } from "./DateValidator";
+import dayjs from "dayjs";
 
 export const validationHandler = (_: any, value: any, validationData: any, isDate?: boolean, allData?: any,messages?:any, column?:any) => {
 
   const stringValue = value;
   // && value.toString();
-  // console.log("validation value",value)
+  console.log("validation value",value)
 
   // Check if the value is null or empty
   if (validationData?.isMandatory) {
+    console.log("inside mandatory:", value);
     if (stringValue == null || stringValue === "") {
       return Promise.reject(messages?.requiredError);
     }
@@ -42,17 +45,19 @@ export const validationHandler = (_: any, value: any, validationData: any, isDat
   }
 
   if (validationData?.allowDuplicates) { 
-    if (isDate) {
+    console.log("inside date:", value);
+    if (isDate && value) {
+      console.log("inside date & condition:", value);
       const valueDate = moment().format('YYYY-MM-DD');
       const columnName = _?.field?.split('.')[1];
       const colIndex = Object.keys(allData[0])?.filter((item:any)=>item != "key")?.[column];
       let count = 0;
       if (allData && allData.length > 0) {
         allData.map((dataValue: any) => {
-          if(typeof dataValue[colIndex] === "object"){
-            dataValue[colIndex] = dataValue[colIndex]?.format("YYYY-MM-DD");
+          if(typeof dataValue[colIndex] === "object" || isValidDateFormat(dataValue[colIndex])){
+            dataValue[colIndex] = dayjs(dataValue[colIndex])?.format("YYYY-MM-DD");
           }
-          if ( dataValue[colIndex]?.format('YYYY-MM-DD') == value?.format('YYYY-MM-DD')) {
+          if ( dayjs(dataValue[colIndex])?.format('YYYY-MM-DD') == dayjs(value)?.format('YYYY-MM-DD')) {
             count++;
           }
         });
@@ -62,20 +67,22 @@ export const validationHandler = (_: any, value: any, validationData: any, isDat
       }
       
     } else {
-      // const columnName = _?.field.split('.')[0];
-      const colIndex = Object.keys(allData[0])?.filter((item:any)=>item != "key")?.[column];
-      let count = 0;
-      if (allData && allData.length > 0) {
-        allData.map((dataValue: any) => {
-          // console.log("compare string", dataValue, value)
-          if (dataValue[colIndex] == value) {
-            count++;
+      console.log("inside duplicate not date:", value);
+      if(value){
+        const colIndex = Object.keys(allData[0])?.filter((item:any)=>item != "key")?.[column];
+        let count = 0;
+        if (allData && allData.length > 0) {
+          allData.map((dataValue: any) => {
+            // console.log("compare string", dataValue, value)
+            if (dataValue[colIndex] == value) {
+              count++;
+            }
+          });
+          if (count > 1) {
+            return Promise.reject(messages?.duplicateError)
           }
-        });
-        if (count > 1) {
-          return Promise.reject(messages?.duplicateError)
-        }
-      } 
+        } 
+      }  
     }
   }
   

@@ -7,9 +7,9 @@
     "validationData": {
       "allowDuplicates": true,
       "isMandatory": false,
-      "maxLength": 10,
+      "maxLength": 0,
       "maxValue": 0,
-      "minLength": 4,
+      "minLength": 0,
       "minValue": 0,
       "numberOfDecimalPlaces": 0
     },
@@ -24,29 +24,34 @@
     "width":360 ,
     "data": [
       {
+        "guid":"12abc",
         "value": "monday",
         "label": "Monday"
       },
       {
+        "guid":"13abc",
         "value": "tuesday",
         "label": "Tuesday"
       },
       {
+        "guid":"14abc",
         "value": "wednesday",
         "label": "Wednesday"
       },
       {
+        "guid":"15abc",
         "value": "thursday",
         "label": "Thursday"
       },
       {
+        "guid":"16abc",
         "value": "friday",
         "label": "Friday"
       }
     ],
     "validationData": {
-      "allowDuplicates": true,
-      "isMandatory": true,
+      "allowDuplicates": false,
+      "isMandatory": false,
       "maxLength": 0,
       "maxValue": 0,
       "minLength": 0,
@@ -61,16 +66,18 @@
     "datatype": "List",
     "data": [
       {
+        "guid":"abcd",
         "value": "Y",
         "label": "Yes"
       },
       {
+        "guid":"abce",
         "value": "N",
         "label": "No"
       }
     ],
     "validationData": {
-      "allowDuplicates": true,
+      "allowDuplicates": false,
       "isMandatory": false,
       "maxLength": 0,
       "maxValue": 0,
@@ -88,9 +95,9 @@
       "allowDuplicates": false,
       "isMandatory": false,
       "maxLength": 0,
-      "maxValue": 5,
+      "maxValue": 0,
       "minLength": 0,
-      "minValue": 1,
+      "minValue": 0,
       "numberOfDecimalPlaces": 0
     },
     "width":360
@@ -101,7 +108,7 @@
     "guid": "acAqwy543cxAbvd",
     "datatype": "Date",
     "validationData": {
-      "allowDuplicates": false,
+      "allowDuplicates": true,
       "isMandatory": false,
       "maxLength": 0,
       "maxValue": 0,

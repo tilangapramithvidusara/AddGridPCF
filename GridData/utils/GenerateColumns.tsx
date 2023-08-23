@@ -3,9 +3,7 @@ import type { ColumnsType } from "antd/es/table";
 import { DatePicker, InputNumber, Input, Select, Form, Checkbox } from "antd";
 import { DateCol, List, Numeric, String } from "../constants/Constants";
 import { validationHandler } from "./Validation";
-// import dayjs, { Dayjs } from "dayjs";
-import moment from "moment";
-import dayjs from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 
 const { Option } = Select;
 
@@ -44,6 +42,7 @@ export const generateColumns = (
       // because if not data inserted based on order of the attributes found in the object  
       const col = response && Object?.keys(response[0] || [])?.filter((item:any)=>item !== "key")?.[index];
       // console.log("row details", row);
+      console.log("validationInputs", validationInputs);
       isColumnFetched(col);   
       let colWidth = 0;
       let columnRender;
@@ -54,8 +53,8 @@ export const generateColumns = (
             <Checkbox  
               key={guid}
               disabled={isDisabled}
-              defaultChecked={row ? !row?.iseditable : !column?.iseditable}
-              onChange={(e) => setIsDisabled( id, e.target.checked)}>
+              defaultChecked={column?.iseditable ? !column?.iseditable : !false}
+              onChange={(e) => setIsDisabled( guid, e.target.checked)}>
                 Lock Data
             </Checkbox>
           </span>);
@@ -63,7 +62,7 @@ export const generateColumns = (
         columnRender = (item: any, record: any, index: number) => {
           return (
             <Form.Item
-              key={index} // Add a unique key to force a re-render
+              key={index} 
               name={[index, `${id}`]}
               initialValue={response[index]?.[col]}
               rules={[
@@ -94,11 +93,11 @@ export const generateColumns = (
         colWidth = width   ? width : 160;
         columnRender = (item: any, record: any, index: number) => {
           // if saved values not similar with current drop down values {showOption=boolean}
-          const showOptions = data?.some((item:any)=>item?.value == response[index]?.[col]); 
+          const showOptions = data?.some((item:any)=>item?.guid == response[index]?.[col]); 
           const columnData = validationInputs?.map((item:any)=> item[id]);
           return (
             <Form.Item
-              key={index} // Add a unique key to force a re-render
+              key={index} 
               name={[index, `${id}`]}
               initialValue={showOptions ? response[index]?.[col] :null}
               rules={[
@@ -113,9 +112,9 @@ export const generateColumns = (
               >
                {data?.map((option: any) => {     
               return (
-                   <Option disabled={validationData?.allowDuplicates ? columnData?.includes(option?.value) : false } key={option?.value} value={option?.value} >
+                  <Option disabled={validationData?.allowDuplicates ? columnData?.includes(option?.guid) : false } key={option?.guid} value={option?.guid} >
                     {option?.label}
-                   </Option>
+                  </Option>
                   )
                }   
                )}
@@ -128,7 +127,7 @@ export const generateColumns = (
         columnRender = (item: any, record: any, index: number) => {
           return (
             <Form.Item
-              key={index} // Add a unique key to force a re-render
+              key={index} 
               name={[index, `${id}`]}
               initialValue={response[index]?.[col]}
               rules={[
@@ -162,7 +161,7 @@ export const generateColumns = (
           // const date: any = moment().format("YYYY-MM-DD");
           const defaultDate: string =  response[index]?.[col];
           // Parse the default date string into a Dayjs object
-          const defaultDayjs:any = defaultDate ? dayjs(defaultDate): dayjs();
+          const defaultDayjs:any = defaultDate ? dayjs(defaultDate): "";
           return (
             <Form.Item
               key={index} // Add a unique key to force a re-render
@@ -172,7 +171,7 @@ export const generateColumns = (
                   validator: (_: any, value: any) => {
                     return validationHandler(
                       _,
-                      value?.format("YYYY-MM-DD"),
+                      value ? value?.format("YYYY-MM-DD") : value,
                       validationData,
                       true,
                       validationInputs?.length>0 && validationInputs,
