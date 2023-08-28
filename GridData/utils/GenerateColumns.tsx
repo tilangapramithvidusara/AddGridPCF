@@ -101,7 +101,19 @@ export const generateColumns = (
               name={[index, `${id}`]}
               initialValue={showOptions ? response[index]?.[col] :null}
               rules={[
-                { required: validationData?.isMandatory, message: messages?.requiredError },
+                {
+                  validator: (_: any, value: any) => {
+                    return validationHandler(
+                      _,
+                      value,
+                      validationData,
+                      false,
+                      validationInputs?.length>0 && validationInputs,
+                      messages,
+                      num
+                    );
+                  },
+                },
               ]}
             >
               <Select

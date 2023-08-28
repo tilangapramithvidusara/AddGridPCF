@@ -60,7 +60,7 @@
 }
 
 .pcf-wrapper .btn-red-outline,.pcf-wrapper .btn-red-outline:hover,.pcf-wrapper .btn-red-outline:active {
-  color: #0f6cbd;
+  color: #0f6cbd !important;
   border-color: #0f6cbd;
   background-color: transparent !important;
   min-width: 90px;
@@ -105,7 +105,7 @@
 }
 
 .pcf-wrapper .mr-10 {
-  margin-right: 10px;
+  margin-right: 10px !important;
 }
 
 .pcf-wrapper table {

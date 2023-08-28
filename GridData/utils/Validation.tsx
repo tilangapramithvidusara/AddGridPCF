@@ -44,10 +44,8 @@ export const validationHandler = (_: any, value: any, validationData: any, isDat
     }
   }
 
-  if (validationData?.allowDuplicates) { 
-    console.log("inside date:", value);
-    if (isDate && value) {
-      console.log("inside date & condition:", value);
+  if (validationData?.allowDuplicates && value) { 
+    if (isDate) {
       const valueDate = moment().format('YYYY-MM-DD');
       const columnName = _?.field?.split('.')[1];
       const colIndex = Object.keys(allData[0])?.filter((item:any)=>item != "key")?.[column];
@@ -67,13 +65,10 @@ export const validationHandler = (_: any, value: any, validationData: any, isDat
       }
       
     } else {
-      console.log("inside duplicate not date:", value);
-      if(value){
         const colIndex = Object.keys(allData[0])?.filter((item:any)=>item != "key")?.[column];
         let count = 0;
         if (allData && allData.length > 0) {
           allData.map((dataValue: any) => {
-            // console.log("compare string", dataValue, value)
             if (dataValue[colIndex] == value) {
               count++;
             }
@@ -82,7 +77,6 @@ export const validationHandler = (_: any, value: any, validationData: any, isDat
             return Promise.reject(messages?.duplicateError)
           }
         } 
-      }  
     }
   }
   
