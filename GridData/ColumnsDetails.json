@@ -9,7 +9,7 @@
       "isMandatory": false,
       "maxLength": 0,
       "maxValue": 0,
-      "minLength": 0,
+      "minLength": 3,
       "minValue": 0,
       "numberOfDecimalPlaces": 0
     },
@@ -95,7 +95,7 @@
       "allowDuplicates": false,
       "isMandatory": false,
       "maxLength": 0,
-      "maxValue": 0,
+      "maxValue": 10,
       "minLength": 0,
       "minValue": 0,
       "numberOfDecimalPlaces": 0

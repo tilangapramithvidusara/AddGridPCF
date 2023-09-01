@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import type { ColumnsType } from "antd/es/table";
 import { DatePicker, InputNumber, Input, Select, Form, Checkbox } from "antd";
 import { DateCol, List, Numeric, String } from "../constants/Constants";
@@ -25,6 +25,7 @@ export const generateColumns = (
   setIsDisabled?:any,
   savedColumns?:any,
   isColumnFetched?:any,
+  handleKeyDown?:any
 ) => {
   const obj = {
     dataIndex: 'hidden',
@@ -85,6 +86,7 @@ export const generateColumns = (
                 placeholder={"Please insert string"}
                 value={item || response[index]?.[id]}
                 disabled={isDisabled}
+                onKeyDown={(e)=>{handleKeyDown(e,index ,id)}} 
               />
             </Form.Item>
           );
@@ -121,6 +123,7 @@ export const generateColumns = (
                 // options={options}
                 value={item || response[index]?.[col]} // new add
                 disabled={isDisabled}
+                onKeyDown={(e)=>{handleKeyDown(e,index ,id)}} 
               >
                {data?.map((option: any) => {     
               return (
@@ -162,6 +165,7 @@ export const generateColumns = (
                 placeholder={"Insert a number"}
                 value={item || response[index]?.[col]}
                 disabled={isDisabled}
+                onKeyDown={(e)=>{handleKeyDown(e,index ,id)}} 
               />
             </Form.Item>
           );
@@ -199,7 +203,8 @@ export const generateColumns = (
                 placeholder={`Select a date`}
                 format={"DD MMM YYYY"}
                 value={defaultDayjs}
-                disabled={isDisabled}          
+                disabled={isDisabled} 
+                onKeyDown={(e)=>{handleKeyDown(e,index ,id)}}         
               />
             </Form.Item>
           );

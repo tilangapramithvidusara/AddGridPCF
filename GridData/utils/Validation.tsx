@@ -17,6 +17,15 @@ export const validationHandler = (_: any, value: any, validationData: any, isDat
     }
   }
 
+   // Check if the value is satisfy min Value
+   if (!(validationData.minLength == 0 && validationData.minLength == null || validationData.minLength == undefined) ) {
+    if (stringValue?.length < validationData?.minLength) {
+      const msg = stringReplace(messages?.minStringValidation ,validationData?.minLength);
+      // `Length must greater than ${validationData?.minLength}`   
+      return Promise.reject(msg);
+    }
+  }
+
    // Check if the value is within the specified length range
   if (!(validationData.minLength == 0 && validationData.maxLength == 0 || validationData.maxLength == null || validationData.maxLength == undefined) ) {
     if (
@@ -27,6 +36,15 @@ export const validationHandler = (_: any, value: any, validationData: any, isDat
       return Promise.reject(msg);
     }
   }
+
+    // Check if the value is satisfy min Value
+    if (!(validationData.maxValue == 0 && validationData.maxValue == null || validationData.maxValue == undefined) ) {
+      if (value > validationData?.maxValue) {
+        const msg = stringReplace(messages?.maxNumberValidation ,validationData?.maxValue );
+        // `Value must less than ${validationData?.maxValue}`
+        return Promise.reject(msg);
+      }
+    }
 
   if (!(validationData.minValue == 0 || validationData.minValue == null || validationData.minValue == undefined )) {
     if (value < validationData?.minValue || value > validationData?.maxValue) {
