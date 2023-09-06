@@ -17,36 +17,39 @@ export const validationHandler = (_: any, value: any, validationData: any, isDat
     }
   }
 
-   // Check if the value is satisfy min Value
-   if (!(validationData.minLength == 0 && validationData.minLength == null || validationData.minLength == undefined) ) {
-    if (stringValue?.length < validationData?.minLength) {
-      const msg = stringReplace(messages?.minStringValidation ,validationData?.minLength);
-      // `Length must greater than ${validationData?.minLength}`   
+   // Check if the value is satisfy min or max length..
+   if(validationData?.minLength || validationData?.maxLength || validationData?.maxValue || validationData?.minValue){
+    if (validationData?.minLength && stringValue?.length < validationData?.minLength && !validationData?.maxLength && stringValue?.length >0) {
+      const msg = stringReplace(messages?.minStringValidation ,validationData?.minLength);  
+      return Promise.reject(msg);
+    }
+    if (validationData?.maxLength && stringValue?.length > validationData?.maxLength && !validationData?.minLength && stringValue?.length > 0) {
+      const msg = stringReplace(messages?.maxStringValidation ,validationData?.maxLength);   
+      return Promise.reject(msg);
+    }
+    if (validationData?.maxValue && value > validationData?.maxValue && !validationData?.minValue && value) {
+      const msg = stringReplace(messages?.maxNumberValidation ,validationData?.maxValue );
+      return Promise.reject(msg);
+    }
+    if (validationData?.minValue && value < validationData?.minValue && !validationData?.maxValue && value) {
+      const msg = stringReplace(messages?.minNumberValidation ,validationData?.minValue );
       return Promise.reject(msg);
     }
   }
 
-   // Check if the value is within the specified length range
-  if (!(validationData.minLength == 0 && validationData.maxLength == 0 || validationData.maxLength == null || validationData.maxLength == undefined) ) {
+   // Check if the string length is within the specific length range
+  if ((validationData.minLength != undefined && validationData.maxLength != undefined || validationData.minLength != null && validationData.maxLength != null) ) {
     if (
       stringValue?.length < validationData?.minLength ||
-      stringValue?.length > validationData?.maxLength
+      stringValue?.length > validationData?.maxLength 
     ) {
       const msg = stringReplace(messages?.stringLengthValidation ,validationData?.minLength,validationData?.maxLength );
       return Promise.reject(msg);
     }
   }
 
-    // Check if the value is satisfy min Value
-    if (!(validationData.maxValue == 0 && validationData.maxValue == null || validationData.maxValue == undefined) ) {
-      if (value > validationData?.maxValue) {
-        const msg = stringReplace(messages?.maxNumberValidation ,validationData?.maxValue );
-        // `Value must less than ${validationData?.maxValue}`
-        return Promise.reject(msg);
-      }
-    }
-
-  if (!(validationData.minValue == 0 || validationData.minValue == null || validationData.minValue == undefined )) {
+  // Check if the number value is within the specific number range
+  if (validationData.minValue != undefined  && validationData.maxValue !=undefined && value || validationData.minValue != null && validationData.maxValue != null && value) {
     if (value < validationData?.minValue || value > validationData?.maxValue) {
       const msg = stringReplace(messages?.numberValueValidation ,validationData?.minValue,validationData?.maxValue);
       return Promise.reject(msg);

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <manifest>
-  <control namespace="Seer365Controls" constructor="GridData" version="1.23.5368" display-name-key="GridData" description-key="GridData description" control-type="standard" >
+  <control namespace="Seer365Controls" constructor="GridData" version="1.23.5380" display-name-key="GridData" description-key="GridData description" control-type="standard" >
     <property name="sampleProperty" display-name-key="Property_Display_Key" description-key="Property_Desc_Key" of-type="SingleLine.Text" usage="bound" required="true" />
    <resources>
          <code path="index.ts"

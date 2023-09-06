@@ -80,11 +80,13 @@ const CustomTable: React.FC = () => {
   const [requiredError, setRequiredError] = useState<string>("Required Field");
   const [decimalValidation, setDecimalValidation] = useState<string>("Number can have a maximum of $ decimal places");
   const [duplicateError, setDuplicateError] = useState<string>("Duplicates not allowed");
-  const [saveDataNotify, setSaveDataNotify] = useState<string>("Data saved Successfully");
-  const [saveDataError, setSaveDataError] = useState<string>("Saving Error. Please try again");
+  const [saveDataNotify, setSaveDataNotify] = useState<string>("Data saved successfully");
+  const [saveDataError, setSaveDataError] = useState<string>("Error in saving. Please try again");
   const [commonError, setCommonError] = useState<string>("Something went wrong. Please try again");
-  const [minStringValidation, setMinStringValidation] = useState<string>("Length must greater than $");
-  const [maxNumberValidation, setMaxNumberValidation] = useState<string>("Value must less than $");
+  const [minNumberValidation, setMinNumberValidation] = useState<string>("Number must be greater than $");
+  const [maxNumberValidation, setMaxNumberValidation] = useState<string>("Number must be less than $");
+  const [maxStringValidation, setMaxStringValidation] = useState<string>("Input must be less than $");
+  const [minStringValidation, setMinStringValidation] = useState<string>("Input must be greater than $");
 
   const loadResourceString = async () => {
     const url =
@@ -97,7 +99,7 @@ const CustomTable: React.FC = () => {
       const response = await fetch(`${webResourceUrl}`);
       const data = await response.text();
       // CREATE YOUR OWN KEYS
-      const filterKeys = ['numberValueValidation', 'stringLengthValidation', 'requiredError','decimalValidation','duplicateError','saveDataNotify','saveDataError','commonError','minStringValidation','maxNumberValidation'];
+      const filterKeys = ['AddGridData_NumberValueValidation', 'AddGridData_StringLengthValidation', 'AddGridData_RequiredError','AddGridData_DecimalValidation','AddGridData_DuplicateError','AddGridData_SaveDataNotify','AddGridData_SaveDataError','AddGridData_CommonError','AddGridData_MinNumberValidation','AddGridData_MaxNumberValidation','AddGridData_MaxStringValidation','AddGridData_MinStringValidation'];
        // Replace with the key you want to filter
       filterKeys.map((filterKey: string, index: number) => {
         const parser = new DOMParser();
@@ -132,9 +134,13 @@ const CustomTable: React.FC = () => {
         }if (index === 7) {
           setCommonError(value)
         }if (index === 8) {
-          setMinStringValidation(value)
+          setMinNumberValidation(value);
         }if (index === 9) {
           setMaxNumberValidation(value)
+        }if (index === 10) {
+          setMaxStringValidation(value)
+        }if (index === 11) {
+          setMinStringValidation(value)
         }
       });
     } catch (error) {
@@ -226,12 +232,12 @@ const CustomTable: React.FC = () => {
   };
   console.log("dataSource", dataSource);
 
-  // useEffect(() => {
-  //   allDataFetch();
-  //   // CALL WEBRESOURCES
-  //   loadResourceString();
+  useEffect(() => {
+    allDataFetch();
+    // CALL WEBRESOURCES
+    loadResourceString();
 
-  // }, []);
+  }, []);
 
   const columnMapping = (data:any) => {
     const extractedIds = dynamicColumns?.map((obj:any) => obj.id);
@@ -273,19 +279,19 @@ const CustomTable: React.FC = () => {
     setColumnsData(dynamicColumns || [], dataSource || [], form, isDisable,savedColumns,inputValues);   
   }, [lockData, dataSource])
 
-  useEffect(() => {
-    setDynamicColumns(ColumnsDetails);
-    setDataSource(xx[0]);
-    setLockData(xx[1])
-    setInputValues(xx[0]);
-    setColumnsData(ColumnsDetails, xx[0], form, isDisable, xx[1],inputValues);
-  }, []);
+  // useEffect(() => {
+  //   setDynamicColumns(ColumnsDetails);
+  //   setDataSource(xx[0]);
+  //   setLockData(xx[1])
+  //   setInputValues(xx[0]);
+  //   setColumnsData(ColumnsDetails, xx[0], form, isDisable, xx[1],inputValues);
+  // }, []);
 
-  const handleLockData = (columnName: string, value: boolean) => {
+  const handleLockData = async(columnName: string, value: boolean) => {
     console.log("column name when edit:", columnName,lockData);
-      const newData = [...lockData] ; 
+      const newData = await lockData ; 
       console.log("newData when edit:", newData); 
-      const dataRecord = newData && newData?.map((item:any)=>{
+      const dataRecord = await newData && newData?.map((item:any)=>{
         if(item.guid == columnName){
           return{
             ...item,
@@ -293,8 +299,11 @@ const CustomTable: React.FC = () => {
           }
         }
         return {...item,"iseditable": value}
-      })
-      setLockData(dataRecord);
+      });
+      setTimeout(()=>{
+        setLockData(dataRecord);
+      },200)
+      
       console.log("column changed:", newData, dataRecord);
   }
 
@@ -312,7 +321,7 @@ const CustomTable: React.FC = () => {
       formData,
       initialValues,
       inputValues,
-      {numberValueValidation,stringLengthValidation,requiredError,decimalValidation,duplicateError,minStringValidation,maxNumberValidation},
+      {numberValueValidation,stringLengthValidation,requiredError,decimalValidation,duplicateError,minStringValidation,maxNumberValidation,maxStringValidation,minNumberValidation},
       disable,
       handleLockData,
       savedColumns,
@@ -343,7 +352,6 @@ const CustomTable: React.FC = () => {
   };
 
   const handleDelete = async(rows: []) => {
-    console.log("inputValues",inputValues, rows);
     const deletedRows = rows?.map((item:any)=>item?.key);
     const newData = await inputValues?.filter(
       (item: any) => !deletedRows?.includes(item?.key)
@@ -358,8 +366,6 @@ const CustomTable: React.FC = () => {
       form.resetFields();
       form.setFieldsValue(columnMapping(newData));
     },300);
-    // localStorage.setItem("deletedRows",JSON.stringify(newData));
-    console.log("newData", newData);
   };
  
   const rowSelection = {
@@ -373,7 +379,6 @@ const CustomTable: React.FC = () => {
   };
 
   const cancel = () => {
-    // setEditingKey("");
     form.resetFields();
   };
 
@@ -448,16 +453,16 @@ const CustomTable: React.FC = () => {
     const dataArray = Object.values(data);
     const newDataArray = dataArray?.map((item:any,num:number)=>{return{key:num,...item}})
     newDataArray?.length>0 && setInputValues(newDataArray);
-    localStorage.setItem("inputData",JSON.stringify(newDataArray,(key,value)=>{return typeof value === 'undefined' ? null : value;}));
   };
 
   const handleKeyDown = async (event: React.KeyboardEvent<HTMLInputElement>, id: number, column:string) => {
-    console.log("id", id, "column", column);
-    const dataSet = await columnMapping(dataSource);
-    const validate = await dataSet?.find((item:any)=>item?.key == id);
-    const lastElementKeys = Object.keys(validate);
-    const lastKey = lastElementKeys[lastElementKeys.length - 1];
-    if (event.key === 'Tab' && `${id}_${lastKey}` == `${id}_${column}`) {
+
+    const data = await form.getFieldsValue();
+    const dataSet = await data && Object.values(data);
+    const validate = await dataSet[dataSet?.length -1];
+    const lastElementKeys = await validate && Object.keys(validate);
+    const lastKey = lastElementKeys[lastElementKeys?.length - 1];
+    if (event.key === 'Tab' && `${dataSet?.length -1}_${lastKey}` == `${id}_${column}`) {
       handleAdd();
     }
   };
