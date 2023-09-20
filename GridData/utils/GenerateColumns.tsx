@@ -27,6 +27,8 @@ export const generateColumns = (
   isColumnFetched?:any,
   handleKeyDown?:any
 ) => {
+  console.log("isDisabled ====> ", isDisabled);
+  
   const obj = {
     dataIndex: 'hidden',
     width: 'auto',
@@ -35,10 +37,17 @@ export const generateColumns = (
   const updatedColumns =  [...columnConfig, obj];
   const dynamicColumns : ColumnsType<any> = updatedColumns?.map(
     (column: any, num: any) => {
-      const { id, order,guid ,datatype, data, validationData, width } = column;
+      const { id, order, guid, datatype, data, validationData, width, identifier } = column;
       // find the relevant row details based on unique id - {guid}
-      const row = columnConfig?.find((row:any)=> savedColumns?.find((id:any)=>id?.guid == row?.guid));
-      const index = savedColumns?.findIndex((item:any)=>item?.guid==guid);
+
+      // CHANGE TILANGA
+      // const row = columnConfig?.find((row:any)=> savedColumns?.find((id:any)=>id?.guid == row?.guid));
+      // const index = savedColumns?.findIndex((item:any)=>item?.guid==guid);
+
+      const row = columnConfig?.find((row:any)=> savedColumns?.find((id:any)=>id?.identifier == row?.identifier));
+      const index = savedColumns?.findIndex((item:any)=>item?.identifier==identifier);
+
+
       // key attribute added in order to identify uniquely check boxes in delete functionality here remove that key -
       // because if not data inserted based on order of the attributes found in the object  
       const col = response && Object?.keys(response[0] || [])?.filter((item:any)=>item !== "key")?.[index];
@@ -52,10 +61,12 @@ export const generateColumns = (
         title = (
           <span  className="flex-wrap"> {id}   
             <Checkbox  
-              key={guid}
+              key={identifier}
               disabled={isDisabled}
               defaultChecked={column?.iseditable ? !column?.iseditable : !false}
-              onChange={(e) => setIsDisabled( guid, e.target.checked)}>
+              // onChange={(e) => setIsDisabled( guid, e.target.checked)} // change Tilanga
+              onChange={(e) => setIsDisabled( identifier, e.target.checked)}
+              >
                 Lock Data
             </Checkbox>
           </span>);
@@ -95,7 +106,8 @@ export const generateColumns = (
         colWidth = width   ? width : 160;
         columnRender = (item: any, record: any, index: number) => {
           // if saved values not similar with current drop down values {showOption=boolean}
-          const showOptions = data?.some((item:any)=>item?.guid == response[index]?.[col]); 
+          // const showOptions = data?.some((item:any)=>item?.guid == response[index]?.[col]); // change Tilanga
+          const showOptions = data?.some((item:any)=>item?.identifier == response[index]?.[col]);
           const columnData = validationInputs?.map((item:any)=> item[id]);
           return (
             <Form.Item
@@ -127,7 +139,8 @@ export const generateColumns = (
               >
                {data?.map((option: any) => {     
               return (
-                  <Option disabled={validationData?.allowDuplicates ? columnData?.includes(option?.guid) : false } key={option?.guid} value={option?.guid} >
+                  // <Option disabled={validationData?.allowDuplicates ? columnData?.includes(option?.guid) : false } key={option?.guid} value={option?.guid} > // change Tilanga
+                  <Option disabled={validationData?.allowDuplicates ? columnData?.includes(option?.identifier) : false } key={option?.identifier} value={option?.identifier} >
                     {option?.label}
                   </Option>
                   )

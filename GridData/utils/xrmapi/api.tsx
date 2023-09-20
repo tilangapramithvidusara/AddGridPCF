@@ -70,11 +70,13 @@ export const retrieveColumnDetails = async (
 ): Promise<any> => {
   try {
     // console.log("column Data with is editable", columnData)
-    const result = await window.parent.Xrm.WebApi.retrieveMultipleRecords(entityLogicalName, `?$select=gyde_columnwidth,gyde_defaultcolumnwidth,gyde_ismandatory,gyde_isdontallowduplicates,gyde_maxlength,gyde_maxvalue,gyde_minlength,gyde_minvalue,gyde_numberofdecimalplaces&$filter=_gyde_surveytemplatequestion_value eq ${id}`);
-    console.log(" result", result );
+    const result = await window.parent.Xrm.WebApi.retrieveMultipleRecords(entityLogicalName, `?$select=gyde_columnwidth,gyde_defaultcolumnwidth,gyde_ismandatory,gyde_isdontallowduplicates,gyde_internalid,gyde_maxlength,gyde_lastupdateseerversion,gyde_maxvalue,gyde_minlength,gyde_minvalue,gyde_numberofdecimalplaces&$filter=_gyde_surveytemplatequestion_value eq ${id}`);
+    console.log(" result ====>", result );
     return { error: false, data: result, loading: false };
   } catch (error: any) {
     // handle error conditions
+    console.log('retrieveColumnDetails error ====> ', error);
+    
     return { error: true, data: [], loading: false };
   }
 };

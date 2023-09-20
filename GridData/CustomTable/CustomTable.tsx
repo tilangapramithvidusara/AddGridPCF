@@ -19,6 +19,8 @@ declare global {
     Xrm: any;
   }
 }
+let lockDataGlobal: any;
+let isDisableGlobal: any;
 
 const CustomTable: React.FC = () => {
   const [dataSource, setDataSource] = useState<any>([]);
@@ -152,6 +154,7 @@ const CustomTable: React.FC = () => {
     setLoading(true);
     await fetchRecordId()
       .then(async (id) => {
+        console.log('fetchRecordId function =========> ', id)
         setQuestionId(id?.data);
         const getGridData = await fetchRequest(
           GYDE_SURVEY_TEMPLATE,
@@ -160,13 +163,21 @@ const CustomTable: React.FC = () => {
         )
           .then(async (records) => {
             const jsonParse = await JSON.parse(records.data.gyde_jsoncolumn);
+            console.log('fetchRequest gyde_jsoncolumn function =========> ', jsonParse)
+            lockDataGlobal = jsonParse;
+            // setLockData(jsonParse);
             let tableData = await JSON.parse(records.data.gyde_jsondata);
+            console.log("tableData =======> ", tableData);
             if (typeof tableData == "undefined") {
               tableData = [];
             }
             const restColumnData = await retrieveColumnDetails(GYDE_GRID_QUESTION,id?.data);
+            console.log("restColumnData ======> ", restColumnData);
             const newColumnData = jsonParse?.map((item:any)=> {
-            const completeData =  restColumnData?.data?.entities?.find((val:any)=> val?.gyde_surveytemplatequestiongridcolumnid == item?.guid);
+              // const completeData =  restColumnData?.data?.entities?.find((val:any)=> val?.gyde_surveytemplatequestiongridcolumnid == item?.guid); V${val?.['gyde_lastupdateseerversion@OData.Community.Display.V1.FormattedValue']}
+              const completeData =  restColumnData?.data?.entities?.find((val:any)=> `${val?.['gyde_internalid']}` == item?.identifier);
+              console.log("completeData =======> ", completeData);
+            
               if(completeData){
                   return {
                     ...item,
@@ -185,32 +196,55 @@ const CustomTable: React.FC = () => {
               // console.log("full data set",newColumnData)  ; 
             })
             // console.log("restColumnData", restColumnData);
-            // console.log("new column Details", newColumnData);
+            console.log("newColumnData column Details ===> ", newColumnData);
             // console.log("jsonParse ===>", jsonParse);
             // console.log("jsonData ===>", tableData);
+            var surveyTemplate = await window.parent.Xrm.Page.getAttribute("gyde_surveytemplate")?.getValue()[0]?.id?.replace("{", "")
+              .replace("}", "");
+            await window.parent.Xrm.WebApi.retrieveRecord("gyde_surveytemplate", surveyTemplate, "?$select=statuscode").then(
+              function success(result: any) {
+                  console.log("result status ====>", result.statuscode);
+                  if (result.statuscode == 528670003 || result.statuscode == 528670005 || result.statuscode == 2) {
+                    setIsDisable(true)
+                    isDisableGlobal = true
+                  } else {
+                    setIsDisable(false);
+                    isDisableGlobal = false
+                  }
+                  // perform operations on record retrieval
+              },
+              function (error: any) {
+                  console.log("error message ====> ", error.message);
+                  setIsDisable(false);
+                  isDisableGlobal = false;
+                  // handle error conditions
+              }
+            );
 
-            if (records.data.statuscode == 2 || records.data.statuscode == 528670001) {
-              setIsDisable(true)
-            } else {
-              setIsDisable(false);
-            }
-            const newData = tableData?.[0]?.map((item: any, num: number) => {
+            // if (records.data.statuscode == 2 || records.data.statuscode == 528670001) {
+            //   setIsDisable(true)
+            // } else {
+            //   setIsDisable(false);
+            // }
+            const newData = await tableData?.[0]?.map((item: any, num: number) => {
               return {
                 ...item,
                 key: num,
               };
             });
-            setSavedColumns( tableData?.[1])
+            setSavedColumns(tableData?.[1])
             setDynamicColumns(newColumnData || []);
             setLockData(jsonParse);
             setDataSource(newData || []);
             newData?.length>0 && setInputValues(newData);
-            setColumnsData(newColumnData || [], newData || [], form, isDisable,tableData?.[1],newData);
+            console.log("mmm ===> ", isDisable ? isDisable : isDisableGlobal ? isDisableGlobal : isDisable, isDisable, isDisableGlobal);
+            
+            setColumnsData(newColumnData || [], newData || [], form, isDisable ? isDisable : isDisableGlobal ? isDisableGlobal : isDisable,tableData?.[1],newData, jsonParse);
             setCount(count + 1);
             setLoading(false);
           })
           .catch((err) => {
-            console.log("error when column fetching", err);
+            console.log("error when column fetching =======> ", err);
             setLoading(false);
             let notificationType = "ERROR";
             // const msg = <span style={{color:ERROR_COLOUR_CODE}}>{commonError}</span>;
@@ -220,7 +254,9 @@ const CustomTable: React.FC = () => {
               }, 10000);
           });
       })
-      .catch(() => {
+      .catch((error: any) => {
+        console.log("error came ======> ", error);
+        
         setLoading(false);
         let notificationType = "ERROR";
         // const msg = <span style={{color: ERROR_COLOUR_CODE}}>{commonError}</span>;
@@ -289,10 +325,13 @@ const CustomTable: React.FC = () => {
 
   const handleLockData = async(columnName: string, value: boolean) => {
     console.log("column name when edit:", columnName,lockData);
-      const newData = await lockData ; 
+
+      const newData = lockData.length > 0 ? lockData : lockDataGlobal?.length > 0 ? lockDataGlobal : [];
+      // await lockData ; 
       console.log("newData when edit:", newData); 
       const dataRecord = await newData && newData?.map((item:any)=>{
-        if(item.guid == columnName){
+        // if(item.guid == columnName || item?.identifier == columnName){ // change Tilanga
+        if(item?.identifier == columnName){
           return{
             ...item,
             "iseditable":!value
@@ -301,11 +340,15 @@ const CustomTable: React.FC = () => {
         return {...item,"iseditable": value}
       });
       setTimeout(()=>{
+        lockDataGlobal = dataRecord
         setLockData(dataRecord);
       },200)
       
       console.log("column changed:", newData, dataRecord);
   }
+
+  console.log('here is lock data ===> ', lockData);
+  
 
   const setColumnsData = (
     dynamicColumns: any,
@@ -314,6 +357,7 @@ const CustomTable: React.FC = () => {
     disable?: boolean,
     savedColumns?:any,
     inputValues?:any,
+    initLockData?: any[]
   ) => {
     const columns = generateColumns(
       dynamicColumns,
@@ -411,7 +455,7 @@ const CustomTable: React.FC = () => {
     convertedArray?.forEach((item:any) => {
       replaceUndefinedWithNull(item);
     });
-    const filteredGuid = dynamicColumns?.map((item:any)=>{return{guid:item?.guid}});
+    const filteredGuid = dynamicColumns?.map((item:any)=>{return{guid:item?.guid, identifier: item?.identifier}}); // change tilanga
     const final = [convertedArray, filteredGuid];
     console.log("final object to save:", final,"columns:",columnData);
     const records = JSON.stringify(final);

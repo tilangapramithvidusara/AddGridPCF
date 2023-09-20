@@ -50,6 +50,7 @@
   
   <ItemGroup>
     <ProjectReference Include="..\GridDataPCF.pcfproj" />
+    <ProjectReference Include="../GridDataPCF.pcfproj" />
   </ItemGroup>
 
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" />
