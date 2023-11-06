@@ -3,9 +3,10 @@ import { Button, Form, Table, } from "antd";
 import dayjs, { Dayjs } from "dayjs";
 import { generateColumns } from "../utils/GenerateColumns";
 import ColumnsDetails from "../ColumnsDetails.json";
-import { fetchRecordId, fetchRequest, retrieveColumnDetails, saveColumnData, saveRequest } from "../utils/xrmapi/api";
+import { fetchRecordId, fetchRequest, loadResourceString, retrieveColumnDetails, saveColumnData, saveRequest } from "../utils/xrmapi/api";
 import { GYDE_GRID_QUESTION, GYDE_SURVEY_TEMPLATE, SUCCESS_COLOUR_CODE } from "../constants/Constants";
 import { isValidDateFormat } from "../utils/DateValidator";
+import { languageConstantsForCountry } from "../constants/languageConstants";
 
 interface Item {
   key: string;
@@ -38,6 +39,9 @@ const CustomTable: React.FC = () => {
   const [isDisable, setIsDisable] = useState(false);
   const [filteredCol, setFilteredCol] = useState();
   const [deleteTrigger, setDeleteTrigger] = useState(false);
+  const [languageConstants, setLanguageConstants] = useState<any>(
+    languageConstantsForCountry.en
+  );
   const xx: any = [
     [
       {
@@ -77,78 +81,78 @@ const CustomTable: React.FC = () => {
   ];
 
   // SAMPLE FOR DYNAMIC MESSAGES USE
-  const [numberValueValidation, setNumberValueValidation] = useState<string>("Number must have a value between $ and $$");
-  const [stringLengthValidation, setStringLengthValidation] = useState<string>("Input must have a length between $ and $$");
-  const [requiredError, setRequiredError] = useState<string>("Required Field");
-  const [decimalValidation, setDecimalValidation] = useState<string>("Number can have a maximum of $ decimal places");
-  const [duplicateError, setDuplicateError] = useState<string>("Duplicates not allowed");
-  const [saveDataNotify, setSaveDataNotify] = useState<string>("Data saved successfully");
-  const [saveDataError, setSaveDataError] = useState<string>("Error in saving. Please try again");
-  const [commonError, setCommonError] = useState<string>("Something went wrong. Please try again");
-  const [minNumberValidation, setMinNumberValidation] = useState<string>("Number must be greater than $");
-  const [maxNumberValidation, setMaxNumberValidation] = useState<string>("Number must be less than $");
-  const [maxStringValidation, setMaxStringValidation] = useState<string>("Input must be less than $");
-  const [minStringValidation, setMinStringValidation] = useState<string>("Input must be greater than $");
+  // const [numberValueValidation, setNumberValueValidation] = useState<string>("Number must have a value between $ and $$");
+  // const [stringLengthValidation, setStringLengthValidation] = useState<string>("Input must have a length between $ and $$");
+  // const [requiredError, setRequiredError] = useState<string>("Required Field");
+  // const [decimalValidation, setDecimalValidation] = useState<string>("Number can have a maximum of $ decimal places");
+  // const [duplicateError, setDuplicateError] = useState<string>("Duplicates not allowed");
+  // const [saveDataNotify, setSaveDataNotify] = useState<string>("Data saved successfully");
+  // const [saveDataError, setSaveDataError] = useState<string>("Error in saving. Please try again");
+  // const [commonError, setCommonError] = useState<string>("Something went wrong. Please try again");
+  // const [minNumberValidation, setMinNumberValidation] = useState<string>("Number must be greater than $");
+  // const [maxNumberValidation, setMaxNumberValidation] = useState<string>("Number must be less than $");
+  // const [maxStringValidation, setMaxStringValidation] = useState<string>("Input must be less than $");
+  // const [minStringValidation, setMinStringValidation] = useState<string>("Input must be greater than $");
 
-  const loadResourceString = async () => {
-    const url =
-      await window.parent.Xrm.Utility.getGlobalContext().getClientUrl();
-    const language = await window.parent.Xrm.Utility.getGlobalContext()
-      .userSettings.languageId;
-    const webResourceUrl = `${url}/WebResources/gyde_localizedstrings.${language}.resx`;
+  // const loadResourceString = async () => {
+  //   const url =
+  //     await window.parent.Xrm.Utility.getGlobalContext().getClientUrl();
+  //   const language = await window.parent.Xrm.Utility.getGlobalContext()
+  //     .userSettings.languageId;
+  //   const webResourceUrl = `${url}/WebResources/gyde_localizedstrings.${language}.resx`;
 
-    try {
-      const response = await fetch(`${webResourceUrl}`);
-      const data = await response.text();
-      // CREATE YOUR OWN KEYS
-      const filterKeys = ['AddGridData_NumberValueValidation', 'AddGridData_StringLengthValidation', 'AddGridData_RequiredError','AddGridData_DecimalValidation','AddGridData_DuplicateError','AddGridData_SaveDataNotify','AddGridData_SaveDataError','AddGridData_CommonError','AddGridData_MinNumberValidation','AddGridData_MaxNumberValidation','AddGridData_MaxStringValidation','AddGridData_MinStringValidation'];
-       // Replace with the key you want to filter
-      filterKeys.map((filterKey: string, index: number) => {
-        const parser = new DOMParser();
-        // Parse the XML string
-        const xmlDoc = parser.parseFromString(data, "text/xml");
-        // Find the specific data element with the given key
-        const dataNode: any = xmlDoc.querySelector(`data[name="${filterKey}"]`);
-        // Extract the value from the data element
-        const value: any = dataNode?.querySelector("value").textContent;
+  //   try {
+  //     const response = await fetch(`${webResourceUrl}`);
+  //     const data = await response.text();
+  //     // CREATE YOUR OWN KEYS
+  //     const filterKeys = ['AddGridData_NumberValueValidation', 'AddGridData_StringLengthValidation', 'AddGridData_RequiredError','AddGridData_DecimalValidation','AddGridData_DuplicateError','AddGridData_SaveDataNotify','AddGridData_SaveDataError','AddGridData_CommonError','AddGridData_MinNumberValidation','AddGridData_MaxNumberValidation','AddGridData_MaxStringValidation','AddGridData_MinStringValidation'];
+  //      // Replace with the key you want to filter
+  //     filterKeys.map((filterKey: string, index: number) => {
+  //       const parser = new DOMParser();
+  //       // Parse the XML string
+  //       const xmlDoc = parser.parseFromString(data, "text/xml");
+  //       // Find the specific data element with the given key
+  //       const dataNode: any = xmlDoc.querySelector(`data[name="${filterKey}"]`);
+  //       // Extract the value from the data element
+  //       const value: any = dataNode?.querySelector("value").textContent;
 
-        // SET MESSAGES ACCORDING TO YOUR ORDER
-        if (index === 0) {
-          setNumberValueValidation(value)
-        }
-        if (index === 1) {
-          setStringLengthValidation(value)
-        }
-        if (index === 2) {
-          setRequiredError(value)
-        }
-        if (index === 3) {
-          setDecimalValidation(value)
-        }
-        if (index === 4) {
-          setDuplicateError(value)
-        }
-        if (index === 5) {
-          setSaveDataNotify(value)
-        }
-        if (index === 6) {
-          setSaveDataError(value)
-        }if (index === 7) {
-          setCommonError(value)
-        }if (index === 8) {
-          setMinNumberValidation(value);
-        }if (index === 9) {
-          setMaxNumberValidation(value)
-        }if (index === 10) {
-          setMaxStringValidation(value)
-        }if (index === 11) {
-          setMinStringValidation(value)
-        }
-      });
-    } catch (error) {
-      console.error("Error loading data:", error);
-    }
-  };
+  //       // SET MESSAGES ACCORDING TO YOUR ORDER
+  //       if (index === 0) {
+  //         setNumberValueValidation(value)
+  //       }
+  //       if (index === 1) {
+  //         setStringLengthValidation(value)
+  //       }
+  //       if (index === 2) {
+  //         setRequiredError(value)
+  //       }
+  //       if (index === 3) {
+  //         setDecimalValidation(value)
+  //       }
+  //       if (index === 4) {
+  //         setDuplicateError(value)
+  //       }
+  //       if (index === 5) {
+  //         setSaveDataNotify(value)
+  //       }
+  //       if (index === 6) {
+  //         setSaveDataError(value)
+  //       }if (index === 7) {
+  //         setCommonError(value)
+  //       }if (index === 8) {
+  //         setMinNumberValidation(value);
+  //       }if (index === 9) {
+  //         setMaxNumberValidation(value)
+  //       }if (index === 10) {
+  //         setMaxStringValidation(value)
+  //       }if (index === 11) {
+  //         setMinStringValidation(value)
+  //       }
+  //     });
+  //   } catch (error) {
+  //     console.error("Error loading data:", error);
+  //   }
+  // };
 
   const allDataFetch = async () => {
     setLoading(true);
@@ -248,7 +252,7 @@ const CustomTable: React.FC = () => {
             setLoading(false);
             let notificationType = "ERROR";
             // const msg = <span style={{color:ERROR_COLOUR_CODE}}>{commonError}</span>;
-            window.parent.Xrm.Page.ui.formContext.ui.setFormNotification(commonError, notificationType);
+            window.parent.Xrm.Page.ui.formContext.ui.setFormNotification(languageConstants?.AddGridData_CommonError, notificationType);
             setTimeout(function () {
               window.parent.Xrm.Page.ui.formContext.ui.clearFormNotification();
               }, 10000);
@@ -260,7 +264,7 @@ const CustomTable: React.FC = () => {
         setLoading(false);
         let notificationType = "ERROR";
         // const msg = <span style={{color: ERROR_COLOUR_CODE}}>{commonError}</span>;
-        window.parent.Xrm.Page.ui.formContext.ui.setFormNotification(commonError, notificationType);
+        window.parent.Xrm.Page.ui.formContext.ui.setFormNotification(languageConstants?.AddGridData_CommonError, notificationType);
         setTimeout(function () {
           window.parent.Xrm.Page.ui.formContext.ui.clearFormNotification();
         }, 10000);
@@ -268,11 +272,35 @@ const CustomTable: React.FC = () => {
   };
   console.log("dataSource", dataSource);
 
+  const messageHandler = async () => {
+    try {
+      const languageConstantsFromResTable = await loadResourceString();
+      if (languageConstantsFromResTable?.data && languageConstants?.length) {
+        console.log("languageConstantsFromResTable 2", languageConstantsFromResTable);
+        const mergedObject = languageConstantsFromResTable?.data.reduce((result: any, currentObject: any) => {
+          return Object.assign(result, currentObject);
+        }, {});
+        if (Object.keys(mergedObject).length) {
+          const originalConstants = languageConstants[0];
+          const updatedValues = mergedObject[0];
+  
+          for (const key in updatedValues) {
+            if (key in updatedValues && key in originalConstants) {
+              originalConstants[key] = updatedValues[key];
+            }
+          }
+          setLanguageConstants(originalConstants);
+        }
+      }
+    } catch (error) {
+      console.log('error ====>', error);
+    }
+  }
+  
   useEffect(() => {
     allDataFetch();
     // CALL WEBRESOURCES
-    loadResourceString();
-
+    messageHandler();
   }, []);
 
   const columnMapping = (data:any) => {
@@ -365,7 +393,17 @@ const CustomTable: React.FC = () => {
       formData,
       initialValues,
       inputValues,
-      {numberValueValidation,stringLengthValidation,requiredError,decimalValidation,duplicateError,minStringValidation,maxNumberValidation,maxStringValidation,minNumberValidation},
+      {
+        numberValueValidation: languageConstants?.AddGridData_NumberValueValidation,
+        stringLengthValidation: languageConstants?.AddGridData_StringLengthValidation,
+        requiredError: languageConstants?.AddGridData_RequiredError,
+        decimalValidation: languageConstants?.AddGridData_DecimalValidation,
+        duplicateError: languageConstants?.AddGridData_DuplicateError,
+        minStringValidation: languageConstants?.AddGridData_MinStringValidation,
+        maxNumberValidation: languageConstants?.AddGridData_MaxNumberValidation,
+        maxStringValidation: languageConstants?.AddGridData_MaxStringValidation,
+        minNumberValidation: languageConstants?.AddGridData_MinNumberValidation
+      },
       disable,
       handleLockData,
       savedColumns,
@@ -467,7 +505,7 @@ const CustomTable: React.FC = () => {
               if(!res?.error){
                 let notificationType = "INFO";
                 allDataFetch();
-                window.parent.Xrm.Page.ui.formContext.ui.setFormNotification(saveDataNotify, notificationType);
+                window.parent.Xrm.Page.ui.formContext.ui.setFormNotification(languageConstants?.AddGridData_SaveDataNotify, notificationType);
                 setTimeout(function () {
                 window.parent.Xrm.Page.ui.formContext.ui.clearFormNotification();
                 }, 10000);
@@ -477,7 +515,7 @@ const CustomTable: React.FC = () => {
         })
         .catch((err) => {
           let notificationType = "ERROR";
-          window.parent.Xrm.Page.ui.formContext.ui.setFormNotification(saveDataError, notificationType);
+          window.parent.Xrm.Page.ui.formContext.ui.setFormNotification(languageConstants?.AddGridData_SaveDataError, notificationType);
           setTimeout(function () {
             window.parent.Xrm.Page.ui.formContext.ui.clearFormNotification();
             }, 10000);
