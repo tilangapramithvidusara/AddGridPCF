@@ -1,3 +1,4 @@
+import { filterKeys } from "../../constants/filterKeys";
 
 declare global {
   interface Window {
@@ -80,3 +81,40 @@ export const retrieveColumnDetails = async (
     return { error: true, data: [], loading: false };
   }
 };
+
+export const loadResourceString = async () : Promise<any> => {
+
+  const url = await window.parent.Xrm.Utility.getGlobalContext().getClientUrl();
+  const language = await window.parent.Xrm.Utility.getGlobalContext().userSettings.languageId
+  const webResourceUrl = `${url}/WebResources/gyde_localizedstrings.${language}.resx`;
+  const mapper: any = [];
+
+  try {
+    const response = await fetch(`${webResourceUrl}`);
+    const data = await response.text();
+    console.log("Web Res Dataaa", data);
+    console.log("Filter Keyssss", filterKeys);
+    filterKeys?.map((filterKey: string, index: number) => {
+      const parser = new DOMParser();
+      // Parse the XML string
+      const xmlDoc = parser.parseFromString(data, "text/xml");
+      // Find the specific data element with the given key
+      const dataNode: any = xmlDoc.querySelector(`data[name="${filterKey}"]`);
+      // Extract the value from the data element
+      const value: any = dataNode?.querySelector("value").textContent;
+      console.log('data ====> ', index, value); 
+      if (index && value) {
+        mapper.push({ [filterKey]: value });
+      }
+    });
+    
+    return {
+      error: false, data: mapper
+    }
+  } catch (e) {
+    console.log("Language Translation Error", e);
+    return {
+      error: true, data: {}
+    }
+  }
+  }
