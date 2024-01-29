@@ -105,15 +105,18 @@ export const generateColumns = (
       } else if (datatype === List.name) {
         colWidth = width   ? width : 160;
         columnRender = (item: any, record: any, index: number) => {
+
           // if saved values not similar with current drop down values {showOption=boolean}
           // const showOptions = data?.some((item:any)=>item?.guid == response[index]?.[col]); // change Tilanga
-          const showOptions = data?.some((item:any)=>item?.identifier == response[index]?.[col]);
-          const columnData = validationInputs?.map((item:any)=> item[id]);
+          const showOptions = data?.some((itemData:any)=>itemData?.identifier == response[index]?.[col]);
+          console.log('showOptions ==> ', showOptions);
+          
+          const columnData = validationInputs?.map((itemData:any)=> itemData[id]);
           return (
             <Form.Item
               key={index} 
               name={[index, `${id}`]}
-              initialValue={showOptions ? response[index]?.[col] :null}
+              initialValue={showOptions ? response[index]?.[col] : null}
               rules={[
                 {
                   validator: (_: any, value: any) => {
@@ -137,7 +140,9 @@ export const generateColumns = (
                 disabled={isDisabled}
                 onKeyDown={(e)=>{handleKeyDown(e,index ,id)}} 
               >
-               {data?.map((option: any) => {     
+               {data?.map((option: any) => {  
+                console.log('ppp pp pppp pp==> ', option);
+                   
               return (
                   // <Option disabled={validationData?.allowDuplicates ? columnData?.includes(option?.guid) : false } key={option?.guid} value={option?.guid} > // change Tilanga
                   <Option disabled={validationData?.allowDuplicates ? columnData?.includes(option?.identifier) : false } key={option?.identifier} value={option?.identifier} >

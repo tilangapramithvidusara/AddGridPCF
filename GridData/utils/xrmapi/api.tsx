@@ -1,3 +1,4 @@
+import { GYDE_SURVEY_ANSWER, LIST } from "../../constants/Constants";
 import { filterKeys } from "../../constants/filterKeys";
 
 declare global {
@@ -81,6 +82,95 @@ export const retrieveColumnDetails = async (
     return { error: true, data: [], loading: false };
   }
 };
+
+export const retriveListColumnAnsewrs = async(sourceArray: any[], questionId: string): Promise<any> => {
+  try {
+    let sourceDataSet = sourceArray;
+    
+    const response = sourceArray.map(async(sourceItem: any, index: number) => { 
+      if (sourceItem?.datatype == LIST) {
+        if (!sourceDataSet[index].data) {
+          sourceDataSet[index].data = []
+        } else {
+          sourceDataSet[index].data = []
+        }
+        console.log('sourceItem?.identifier ==> ', sourceItem?.identifier, sourceDataSet[index].data);
+        
+        let fetchXml = `?fetchXml=<fetch version="1.0" output-format="xml-platform" mapping="logical" distinct="false">
+          <entity name="gyde_surveytemplatequestiongridcolumn">
+            <attribute name="gyde_surveytemplatequestiongridcolumnid" />
+            <attribute name="gyde_name" />
+            <filter type="and">
+              <condition attribute="gyde_internalid" operator="eq" value="${sourceItem?.identifier}" />  
+              <condition attribute="gyde_surveytemplatequestion" operator="eq" value="${questionId}" />
+            </filter>
+          </entity>
+        </fetch>`
+        // identifier
+        // const result = await window.parent.Xrm.WebApi.retrieveMultipleRecords(GYDE_SURVEY_ANSWER, `?$select=gyde_surveytemplatequestionanswerid,gyde_answervalue,gyde_internalid,gyde_name&$filter=_gyde_relatedquestion_value eq ${sourceItem?.guid}`);
+        const resultColumn = await window.parent.Xrm.WebApi.retrieveMultipleRecords('gyde_surveytemplatequestiongridcolumn', fetchXml);
+        console.log('get column id using internal id ==> ', resultColumn);
+        
+        // await parent.window.Xrm.WebApi.retrieveMultipleRecords(`gyde_surveytemplatequestionanswer", "?$select=gyde_surveytemplatequestionanswerid,gyde_answervalue,gyde_internalid,gyde_name&$filter=_gyde_relatedquestion_value eq 78ab9768-2957-4010-9da8-12389ca44267`)        
+        if (resultColumn && resultColumn?.entities && resultColumn?.entities?.length) {
+          resultColumn.entities.forEach(async(columnItem: any) => {
+            //gyde_surveytemplatequestiongridcolumnid
+            const result = await window.parent.Xrm.WebApi.retrieveMultipleRecords(GYDE_SURVEY_ANSWER, `?$select=gyde_surveytemplatequestionanswerid,gyde_answervalue,gyde_internalid,gyde_name&$filter=_gyde_relatedquestion_value eq ${columnItem?.gyde_surveytemplatequestiongridcolumnid}`);
+            console.log('get column answers using internal id ==> ', result);
+            
+            if (result && result?.entities && result?.entities?.length) {
+              if (!sourceDataSet[index].data) {
+                sourceDataSet[index].data = []
+              }
+              result?.entities.forEach((item: any) => {
+                console.log('result?.entities.forEach ==. ', item);
+                
+                let object = {
+                  guid: item?.gyde_surveytemplatequestionanswerid,
+                  identifier: item?.gyde_internalid,
+                  label: item?.gyde_name,
+                  value: item?.gyde_answervalue,
+                }
+                sourceDataSet[index].data.push(object)
+                console.log('oooo ===> ', sourceDataSet[index]);
+              });
+            }
+          });
+        }
+      }
+    });
+    // const resultColumn = await window.parent.Xrm.WebApi.retrieveMultipleRecords('gyde_surveytemplatequestiongridcolumn', fetchXml);
+    // // await parent.window.Xrm.WebApi.retrieveMultipleRecords(`gyde_surveytemplatequestionanswer", "?$select=gyde_surveytemplatequestionanswerid,gyde_answervalue,gyde_internalid,gyde_name&$filter=_gyde_relatedquestion_value eq 78ab9768-2957-4010-9da8-12389ca44267`)        
+    // if (resultColumn && resultColumn?.entities && resultColumn?.entities?.length) {
+    //   resultColumn?.forEach(async(columnItem: any) => {
+    //     //gyde_surveytemplatequestiongridcolumnid
+    //     const result = await window.parent.Xrm.WebApi.retrieveMultipleRecords(GYDE_SURVEY_ANSWER, `?$select=gyde_surveytemplatequestionanswerid,gyde_answervalue,gyde_internalid,gyde_name&$filter=_gyde_relatedquestion_value eq ${columnItem?.gyde_surveytemplatequestiongridcolumnid}`);
+    //     if (result && result?.entities && result?.entities?.length) {
+    //       if (!sourceDataSet[index].data) {
+    //         sourceDataSet[index].data = []
+    //       }
+    //       result?.entities.forEach((item: any) => {
+    //         let object = {
+    //           guid: item?.gyde_surveytemplatequestionanswerid,
+    //           identifier: item?.gyde_internalid,
+    //           label: item?.gyde_name,
+    //           value: item?.gyde_answervalue,
+    //         }
+    //         sourceDataSet[index].data.push(object)
+    //       });
+    //     }
+    //   });
+    // }
+    await Promise.allSettled(response);
+    console.log('sourceDataSet ==--==> ', sourceDataSet);
+    
+    return sourceDataSet;
+  } catch (error) {
+    console.log('error response  : => ', error);
+    return sourceArray;
+  }
+  
+}
 
 export const loadResourceString = async () : Promise<any> => {
 

@@ -3,8 +3,15 @@ import { Button, Form, Table, } from "antd";
 import dayjs, { Dayjs } from "dayjs";
 import { generateColumns } from "../utils/GenerateColumns";
 import ColumnsDetails from "../ColumnsDetails.json";
-import { fetchRecordId, fetchRequest, loadResourceString, retrieveColumnDetails, saveColumnData, saveRequest } from "../utils/xrmapi/api";
-import { GYDE_GRID_QUESTION, GYDE_SURVEY_TEMPLATE, SUCCESS_COLOUR_CODE } from "../constants/Constants";
+import {
+  fetchRecordId,
+  fetchRequest,
+  loadResourceString,
+  retrieveColumnDetails,
+  retriveListColumnAnsewrs,
+  saveColumnData,
+  saveRequest } from "../utils/xrmapi/api";
+import { DATA, GYDE_GRID_QUESTION, GYDE_SURVEY_TEMPLATE, SUCCESS_COLOUR_CODE } from "../constants/Constants";
 import { isValidDateFormat } from "../utils/DateValidator";
 import { languageConstantsForCountry } from "../constants/languageConstants";
 
@@ -168,16 +175,22 @@ const CustomTable: React.FC = () => {
           .then(async (records) => {
             const jsonParse = await JSON.parse(records.data.gyde_jsoncolumn);
             console.log('fetchRequest gyde_jsoncolumn function =========> ', jsonParse)
-            lockDataGlobal = jsonParse;
+            const jsonColumnData = await retriveListColumnAnsewrs(jsonParse, id?.data)
+            console.log('jsonColumnData ===> ', jsonColumnData);
+            
+            lockDataGlobal = jsonColumnData;
+            // jsonParse;
             // setLockData(jsonParse);
             let tableData = await JSON.parse(records.data.gyde_jsondata);
+            
             console.log("tableData =======> ", tableData);
             if (typeof tableData == "undefined") {
               tableData = [];
             }
             const restColumnData = await retrieveColumnDetails(GYDE_GRID_QUESTION,id?.data);
             console.log("restColumnData ======> ", restColumnData);
-            const newColumnData = jsonParse?.map((item:any)=> {
+            const newColumnData = jsonColumnData?.map((item:any)=> {
+            // jsonParse?.map((item:any)=> {
               // const completeData =  restColumnData?.data?.entities?.find((val:any)=> val?.gyde_surveytemplatequestiongridcolumnid == item?.guid); V${val?.['gyde_lastupdateseerversion@OData.Community.Display.V1.FormattedValue']}
               const completeData =  restColumnData?.data?.entities?.find((val:any)=> `${val?.['gyde_internalid']}` == item?.identifier);
               console.log("completeData =======> ", completeData);
@@ -481,7 +494,18 @@ const CustomTable: React.FC = () => {
   const handleSave = async (data: any) => {
     const convertedArray:any = Object.values(data);
     // const records = JSON.stringify(convertedArray);
-    const columnData = JSON.stringify(lockData);
+    const lockDataSet = lockData
+    lockDataSet.forEach(function(obj: any) {
+      // Check if the attribute exists in the object
+      // eslint-disable-next-line no-prototype-builtins
+      if (obj.hasOwnProperty(DATA)) {
+        // Remove the attribute
+        delete obj[DATA];
+      }
+    });
+    const columnData = JSON.stringify(lockDataSet)
+      // lockData
+    
     for (let index = 0; index < convertedArray.length; index++) {
       const obj : any = convertedArray[index];
       for (let key in obj ) {
